@@ -54,7 +54,7 @@ function App(): React.JSX.Element {
           <Text style={styles.fullScreenText}>{displayText}</Text>
         </TouchableOpacity>
       ) : (
-        <View>
+        <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
             placeholder="Type here"
@@ -62,6 +62,9 @@ function App(): React.JSX.Element {
             onChangeText={setText}
           />
           <Button title="Submit" onPress={handleSubmit} />
+          <Text style={styles.instructionText}>
+            After submit, tap three times quickly to exit that screen.
+          </Text>
         </View>
       )}
     </SafeAreaView>
@@ -74,12 +77,23 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 16,
   },
+  inputContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   input: {
     height: 40,
     borderColor: 'gray',
     borderWidth: 1,
     marginBottom: 12,
     paddingHorizontal: 8,
+    width: '80%',
+  },
+  instructionText: {
+    marginTop: 4,
+    textAlign: 'center',
+    color: 'gray',
+    fontSize: 10,
   },
   fullScreen: {
     flex: 1,
