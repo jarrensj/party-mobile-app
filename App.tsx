@@ -7,7 +7,10 @@ import {
   Button,
   View,
   TouchableOpacity,
+  Dimensions,
 } from 'react-native';
+
+const { width, height } = Dimensions.get('window');
 
 // white, black, pink, blue, orange 
 const predefinedColors = ['#FFFFFF', '#000000', '#FFC0CB', '#0000FF', '#FFA500'];
@@ -68,6 +71,12 @@ function App(): React.JSX.Element {
     }
   };
 
+  const getFontSize = (text: string) => {
+    const baseSize = Math.min(width, height) / 5; // Base font size scaling factor
+    const lengthFactor = text.length > 50 ? 0.4 : text.length > 20 ? 0.6 : 1;
+    return baseSize * lengthFactor;
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {displayText ? (
@@ -76,7 +85,14 @@ function App(): React.JSX.Element {
           activeOpacity={1}
           onPress={handleTripleTap}
         >
-          <Text style={[styles.fullScreenText, { color: textColor }]}>
+          <Text
+            style={[
+              styles.fullScreenText,
+              { color: textColor, fontSize: getFontSize(displayText) },
+            ]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+          >
             {displayText}
           </Text>
         </TouchableOpacity>
@@ -198,7 +214,6 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   fullScreenText: {
-    fontSize: 48,
     transform: [{ rotate: '90deg' }],
     textAlign: 'center',
     width: '100%',
