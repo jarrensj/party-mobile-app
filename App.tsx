@@ -1,13 +1,10 @@
 import React, { useState } from 'react';
 import {
   SafeAreaView,
-  ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
   TextInput,
   Button,
-  useColorScheme,
   View,
 } from 'react-native';
 
@@ -28,7 +25,9 @@ function App(): React.JSX.Element {
       {displayText ? (
         <View style={styles.fullScreen}>
           <Text style={styles.fullScreenText}>{displayText}</Text>
-          <Button title="Exit" onPress={handleExit} />
+          <View style={styles.exitButtonContainer}>
+            <Button title="Exit" onPress={handleExit} />
+          </View>
         </View>
       ) : (
         <View>
@@ -65,7 +64,14 @@ const styles = StyleSheet.create({
   },
   fullScreenText: {
     fontSize: 24,
-    marginBottom: 20,
+    transform: [{ rotate: '90deg' }],
+    textAlign: 'center',
+  },
+  exitButtonContainer: {
+    position: 'absolute',
+    bottom: 20,
+    alignSelf: 'center',
+    width: '30%',
   },
 });
 
