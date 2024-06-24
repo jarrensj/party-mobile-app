@@ -99,9 +99,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 16,
   },
   fullScreenText: {
-    fontSize: 24,
+    fontSize: 48,
     transform: [{ rotate: '90deg' }],
     textAlign: 'center',
   },
