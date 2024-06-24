@@ -7,13 +7,12 @@ import {
   Button,
   View,
   TouchableOpacity,
+  Switch,
   Dimensions,
 } from 'react-native';
 
-const { width, height } = Dimensions.get('window');
-
-// white, black, pink, blue, orange 
 const predefinedColors = ['#FFFFFF', '#000000', '#FFC0CB', '#0000FF', '#FFA500'];
+const { width, height } = Dimensions.get('window');
 
 function App(): React.JSX.Element {
   const [text, setText] = useState('');
@@ -22,6 +21,7 @@ function App(): React.JSX.Element {
   const [textColor, setTextColor] = useState('#000000');
   const [showColorOptions, setShowColorOptions] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
+  const [forceSingleLine, setForceSingleLine] = useState(false);
   const tapCountRef = useRef(0);
   const tapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -90,7 +90,7 @@ function App(): React.JSX.Element {
               styles.fullScreenText,
               { color: textColor, fontSize: getFontSize(displayText) },
             ]}
-            numberOfLines={1}
+            numberOfLines={forceSingleLine ? 1 : undefined}
             adjustsFontSizeToFit
           >
             {displayText}
@@ -137,6 +137,13 @@ function App(): React.JSX.Element {
                     onPress={() => handleBackgroundColorChange(color)}
                   />
                 ))}
+              </View>
+              <View style={styles.switchContainer}>
+                <Text style={styles.label}>Force Single Line </Text>
+                <Switch
+                  value={forceSingleLine}
+                  onValueChange={setForceSingleLine}
+                />
               </View>
             </>
           )}
@@ -199,6 +206,11 @@ const styles = StyleSheet.create({
   warningText: {
     color: 'red',
     marginVertical: 8,
+  },
+  switchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
   },
   instructionText: {
     marginTop: 4,
