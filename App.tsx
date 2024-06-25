@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -14,15 +14,59 @@ import {
 const predefinedColors = ['#FFFFFF', '#000000', '#FFC0CB', '#0000FF', '#FFA500'];
 const { width, height } = Dimensions.get('window');
 
-function App(): React.JSX.Element {
-  const [text, setText] = useState('');
-  const [displayText, setDisplayText] = useState('');
-  const [backgroundColor, setBackgroundColor] = useState('#FFFFFF');
-  const [textColor, setTextColor] = useState('#000000');
-  const [showColorOptions, setShowColorOptions] = useState(false);
-  const [showWarning, setShowWarning] = useState(false);
-  const [forceSingleLine, setForceSingleLine] = useState(false);
-  const tapCountRef = useRef(0);
+interface LEDDisplayProps {
+  text: string;
+  textColor: string;
+  backgroundColor: string;
+  onTripleTap: () => void;
+}
+
+const LEDDisplay: React.FC<LEDDisplayProps> = ({ text, textColor, backgroundColor, onTripleTap }) => {
+  const [position, setPosition] = useState(0);
+
+  useEffect(() => {
+    const animation = setInterval(() => {
+      setPosition((prevPosition) => {
+        if (prevPosition > width) {
+          return -width;
+        }
+        return prevPosition + 8; // speed of animation
+      });
+    }, 50);
+
+    return () => clearInterval(animation);
+  }, []);
+
+  return (
+    <TouchableOpacity
+      style={[styles.ledContainer, { backgroundColor }]}
+      activeOpacity={1}
+      onPress={onTripleTap}
+    >
+      <View style={styles.ledTextContainer}>
+        <Text
+          style={[
+            styles.ledText,
+            { color: textColor, transform: [{ translateX: position }] },
+          ]}
+        >
+          {text}
+        </Text>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
+function App(): JSX.Element {
+  const [text, setText] = useState<string>('');
+  const [displayText, setDisplayText] = useState<string>('');
+  const [backgroundColor, setBackgroundColor] = useState<string>('#FFFFFF');
+  const [textColor, setTextColor] = useState<string>('#000000');
+  const [showColorOptions, setShowColorOptions] = useState<boolean>(false);
+  const [showWarning, setShowWarning] = useState<boolean>(false);
+  const [forceSingleLine, setForceSingleLine] = useState<boolean>(false);
+  const [isLEDMode, setIsLEDMode] = useState<boolean>(false);
+  const tapCountRef = useRef<number>(0);
   const tapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleSubmit = () => {
@@ -31,6 +75,7 @@ function App(): React.JSX.Element {
 
   const handleExit = () => {
     setDisplayText('');
+    setIsLEDMode(false);
   };
 
   const handleTripleTap = () => {
@@ -80,22 +125,31 @@ function App(): React.JSX.Element {
   return (
     <SafeAreaView style={styles.container}>
       {displayText ? (
-        <TouchableOpacity
-          style={[styles.fullScreen, { backgroundColor }]}
-          activeOpacity={1}
-          onPress={handleTripleTap}
-        >
-          <Text
-            style={[
-              styles.fullScreenText,
-              { color: textColor, fontSize: getFontSize(displayText) },
-            ]}
-            numberOfLines={forceSingleLine ? 1 : undefined}
-            adjustsFontSizeToFit
+        isLEDMode ? (
+          <LEDDisplay
+            text={displayText}
+            textColor={textColor}
+            backgroundColor={backgroundColor}
+            onTripleTap={handleTripleTap}
+          />
+        ) : (
+          <TouchableOpacity
+            style={[styles.fullScreen, { backgroundColor }]}
+            activeOpacity={1}
+            onPress={handleTripleTap}
           >
-            {displayText}
-          </Text>
-        </TouchableOpacity>
+            <Text
+              style={[
+                styles.fullScreenText,
+                { color: textColor, fontSize: getFontSize(displayText) },
+              ]}
+              numberOfLines={forceSingleLine ? 1 : undefined}
+              adjustsFontSizeToFit
+            >
+              {displayText}
+            </Text>
+          </TouchableOpacity>
+        )
       ) : (
         <View style={styles.inputContainer}>
           <TextInput
@@ -144,6 +198,10 @@ function App(): React.JSX.Element {
                   value={forceSingleLine}
                   onValueChange={setForceSingleLine}
                 />
+              </View>
+              <View style={styles.switchContainer}>
+                <Text style={styles.label}>LED Display Mode </Text>
+                <Switch value={isLEDMode} onValueChange={setIsLEDMode} />
               </View>
             </>
           )}
@@ -229,6 +287,25 @@ const styles = StyleSheet.create({
     transform: [{ rotate: '90deg' }],
     textAlign: 'center',
     width: '100%',
+  },
+  ledContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: height, // use height for width due to rotation
+    height: '100%',
+    transform: [{ rotate: '90deg' }],
+  },
+  ledTextContainer: {
+    width: height, // use height for width due to rotation
+    overflow: 'hidden',
+    height: '100%', 
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  ledText: {
+    fontSize: 48,
+    fontWeight: 'bold',
   },
 });
 
